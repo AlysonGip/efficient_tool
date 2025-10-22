@@ -1,7 +1,11 @@
+# backend/main.py  —— 可整份覆盖
+
 from pathlib import Path
 from uuid import uuid4
+import os
+from typing import Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -21,7 +25,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"],  # 允许自定义请求头（X-Tushare-Token / X-OpenAI-Key）
     allow_credentials=True,
 )
 
@@ -38,7 +42,22 @@ async def index():
 
 
 @app.post("/api/financials", response_model=QueryResponse)
-async def get_financials(request: QueryRequest):
+async def get_financials(
+    request: QueryRequest,
+    # ⬇️ 新增：从 Header 读取用户自己的 token（别忘了 alias 保持大小写连字符）
+    x_tushare_token: Optional[str] = Header(default=None, alias="X-Tushare-Token"),
+    x_openai_key:   Optional[str] = Header(default=None, alias="X-OpenAI-Key"),
+):
+    # 0) 基本校验：必须要有 Tushare Token（按你业务需求调整）
+    if not x_tushare_token:
+        raise HTTPException(
+            status_code=400, detail="请在请求头 X-Tushare-Token 中填写你的 Tushare Token")
+
+    # 0.1) 兼容老代码：把 Header 写入环境变量，services 内部可继续用 os.getenv 读取
+    os.environ["TUSHARE_TOKEN"] = x_tushare_token
+    if x_openai_key:
+        os.environ["OPENAI_API_KEY"] = x_openai_key
+
     # 1) 拉数 & 组表
     try:
         raw_frames = fetch_financials(request)

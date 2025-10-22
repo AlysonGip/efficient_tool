@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>AlysonG的行研究工具（实习版）</title>
+  <title>AlysonG的行研工具（实习版）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
@@ -19,47 +19,74 @@
   <main class="max-w-6xl mx-auto py-10 px-6 space-y-8">
     <section class="bg-slate-900 p-6 rounded-xl shadow-lg">
       <form id="query-form" class="grid gap-4 lg:grid-cols-2">
+        <!-- Tushare & OpenAI Key -->
         <label class="flex flex-col gap-1">
           <span class="text-sm text-slate-300">Tushare Token</span>
-          <input name="tushare_token" required class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="请输入 Tushare Token">
+          <input id="tushareToken" name="tushare_token" required
+                 class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                 placeholder="请输入 Tushare Token">
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-sm text-slate-300">Excel 文件名</span>
-          <input name="filename" class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="可选，仅文件名，无扩展名">
+          <span class="text-sm text-slate-300">OpenAI API Key（可选）</span>
+          <input id="openaiKey" name="openai_key"
+                 class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                 placeholder="sk-...（可留空）">
         </label>
+
+        <!-- 文件名 -->
+        <label class="flex flex-col gap-1">
+          <span class="text-sm text-slate-300">Excel 文件名</span>
+          <input id="filename" name="filename"
+                 class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                 placeholder="可选，仅文件名，无扩展名">
+        </label>
+
+        <!-- 代码列表 -->
         <label class="flex flex-col gap-1 lg:col-span-2">
           <span class="text-sm text-slate-300">股票代码（逗号分隔，最多10个，如 600000.SH）</span>
-          <textarea name="symbols" required rows="2" class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="示例：600000.SH, 000001.SZ"></textarea>
+          <textarea id="symbols" name="symbols" required rows="2"
+                    class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="示例：600000.SH, 000001.SZ"></textarea>
         </label>
+
+        <!-- 年/季 -->
         <div class="flex gap-4 items-center">
           <label class="flex items-center gap-2">
-            <input type="radio" name="period_type" value="year" checked class="accent-purple-500">
+            <input type="radio" id="periodYear" name="period_type" value="year" checked class="accent-purple-500">
             按年份
           </label>
           <label class="flex items-center gap-2">
-            <input type="radio" name="period_type" value="quarter" class="accent-purple-500">
+            <input type="radio" id="periodQuarter" name="period_type" value="quarter" class="accent-purple-500">
             按季度
           </label>
         </div>
+
+        <!-- 时间范围 -->
         <div class="flex flex-wrap gap-4 lg:col-span-2">
           <label class="flex flex-col gap-1">
             <span class="text-sm text-slate-300">起始年份</span>
-            <input type="number" name="start_year" required class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:ring-2 focus:ring-purple-500">
+            <input id="startYear" type="number" name="start_year" required
+                   class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:ring-2 focus:ring-purple-500">
           </label>
           <label class="flex flex-col gap-1">
             <span class="text-sm text-slate-300">结束年份</span>
-            <input type="number" name="end_year" required class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:ring-2 focus:ring-purple-500">
+            <input id="endYear" type="number" name="end_year" required
+                   class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:ring-2 focus:ring-purple-500">
           </label>
           <label class="flex flex-col gap-1 quarter-only hidden">
             <span class="text-sm text-slate-300">起始季度 (1-4)</span>
-            <input type="number" name="start_quarter" min="1" max="4" class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:ring-2 focus:ring-purple-500">
+            <input id="startQuarter" type="number" name="start_quarter" min="1" max="4"
+                   class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:ring-2 focus:ring-purple-500">
           </label>
           <label class="flex flex-col gap-1 quarter-only hidden">
             <span class="text-sm text-slate-300">结束季度 (1-4)</span>
-            <input type="number" name="end_quarter" min="1" max="4" class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:ring-2 focus:ring-purple-500">
+            <input id="endQuarter" type="number" name="end_quarter" min="1" max="4"
+                   class="rounded-lg bg-slate-800 p-2 text-slate-100 focus:ring-2 focus:ring-purple-500">
           </label>
         </div>
-        <button class="bg-purple-600 hover:bg-purple-500 transition rounded-lg py-2 px-4 font-semibold lg:col-span-2">查询</button>
+
+        <button id="run" type="submit"
+                class="bg-purple-600 hover:bg-purple-500 transition rounded-lg py-2 px-4 font-semibold lg:col-span-2">查询</button>
       </form>
     </section>
 
