@@ -27,7 +27,7 @@ uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 
 ## 使用说明
 
-- 在页面上输入个人的 Tushare Token（测试 Token：`11db2c7ff5a19c651cc46112995b51a346ac99748f31f824a75a120a`）。
+- 在页面上输入个人的 Tushare Token（测试 Token：）。
 - 股票代码以逗号分隔，最多 10 个。
 - 支持按年份或按季度查询；按季度时需指定起止季度。
 - 查询完成后，可查看 GPT 总结、指标表格，并下载 Excel 文件。
